@@ -95,33 +95,54 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
     /* メッセージループ */
     MSG msg;
 
-    while (GetMessage(&msg, nullptr, 0, 0))
+    do
     {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
-    }
+        if (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
+        {
+            // ウィンドウメッセージが来ていたら
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
+        {
+            // ゲームの処理
+        }
 
-    return (int)msg.wParam;
+    }
+    while (msg.message != WM_QUIT);
+
+    return 0;
 }
 
 /*------------------------------------------------------------------------------
         ウィンドウプロシージャ
 ------------------------------------------------------------------------------*/
-LRESULT CALLBACK WndProc(HWND hWnd,
-    UINT message,
-    WPARAM wParam,
-    LPARAM lParam)
+LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
+    switch (uMsg)
     {
-    case WM_DESTROY: // ウィンドウの破棄メッセージ
-        PostQuitMessage(0); // WM_QUITメッセージの送信
+    case WM_KEYDOWN:
+        if (wParam == VK_ESCAPE)
+        {
+            int result = MessageBox(
+                hWnd,
+                "終了しますか？",
+                "確認",
+                MB_YESNO | MB_ICONQUESTION
+            );
+
+            if (result == IDYES)
+            {
+                PostQuitMessage(0);
+            }
+            return 0;
+        }
         break;
 
-    default:
-        // 通常のメッセージ処理はこの関数に任せる
-        return DefWindowProc(hWnd, message, wParam, lParam);
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        return 0;
     }
 
-    return 0;
+    return DefWindowProc(hWnd, uMsg, wParam, lParam);
 }
