@@ -9,6 +9,11 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+bool Direct3D_Initialize(HWND window_handle);
+void Direct3D_Finalize();
+void Direct3D_Begin();
+void Direct3D_Present();
+
 #include <algorithm>
 
 #include "configuration.h"
@@ -89,6 +94,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
         nullptr
     );
 
+    Direct3D_Initialize(hWnd);
     ShowWindow(hWnd, nCmdShow);
     UpdateWindow(hWnd);
 
@@ -106,10 +112,15 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
         else
         {
             // ゲームの処理
+            Direct3D_Begin();
+            Direct3D_Present();
         }
 
     }
     while (msg.message != WM_QUIT);
+
+
+    Direct3D_Finalize();
 
     return 0;
 }
